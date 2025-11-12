@@ -8,9 +8,9 @@
 // In this pattern, we encapsulate a request or command as an object, thereby allowing for parameterization of clients
 // with queues, requests, and operations.
 
-// Parametrization means that we can pass different commands to the same method or function.
+// Parametrization means that we can pass different commands to the same method.
 // - Because commands are objects, you can pass them around like data.
-// - That means a client (like your program) can:
+// - That means a client (like this program) can:
 //   - Queue them → line up a list of actions to run later.
 //   - Store them as requests → save what should be done, even if it’s not done immediately.
 //   - Treat operations as objects → so you can easily switch, undo, or redo them.
@@ -21,7 +21,7 @@ namespace CommandDP
 {
     // Command Interface
     // A general command
-    interface ICommand
+    internal interface ICommand
     {
         void Execute();
     }
@@ -34,8 +34,8 @@ namespace CommandDP
     // A Light class or object that does actions (the real work)
     internal class Light
     {
-        public void TurnOn() => Console.WriteLine("Light is ON");
-        public void TurnOff() => Console.WriteLine("Light is OFF");
+        public void TurnOn() => Console.WriteLine("Light is ON.");
+        public void TurnOff() => Console.WriteLine("Light is OFF.");
     }
 
     
@@ -44,7 +44,7 @@ namespace CommandDP
 
     // Concrete Commands
     // First Command
-    class TurnOnCommand : ICommand
+    internal class TurnOnCommand : ICommand
     {
         private Light _light;
         public TurnOnCommand(Light light) => _light = light;
@@ -53,7 +53,7 @@ namespace CommandDP
 
 
     // Second Command
-    class TurnOffCommand : ICommand
+    internal class TurnOffCommand : ICommand
     {
         private Light _light;
         public TurnOffCommand(Light light) => _light = light;
@@ -66,7 +66,7 @@ namespace CommandDP
 
     // Invoker
     // The device (remote control) that creates a command
-    class RemoteControl
+    internal class RemoteControl
     {
         #pragma warning disable CS8618
         private ICommand _command;
@@ -115,9 +115,9 @@ namespace CommandDP
 Final Recap:
 
 (1) We define a general command interface.
-(2) We define a class (in this example: a light) that will perform the real action.
+(2) We define a class or object (in this example: a light) that will perform the real action.
 (3) We define concrete commands for the light (turn on and turn off).
-(4) We define a class for a device (in this example: a remote control) that will invoke commands.
+(4) We define a class or object for a device (in this example: a remote control) that will invoke commands.
 (5) The client class creates a light object and a remote control object.
     Then, the client uses the remote control to send commands to the light.
     The light receives the commands and executes them.
