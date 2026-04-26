@@ -2,11 +2,10 @@
 // Amir Moeini Rad
 // September 2025
 
-// Main Concept: Command Design Pattern
-// With Help from ChatGPT
+// Main Concept: The Command Design Pattern
 
-// In this pattern, we encapsulate a request or command as an object, thereby allowing for parameterization of clients
-// with queues, requests, and operations.
+// In this pattern, we encapsulate a request or command as an object,
+// thereby allowing for parameterization of clients.
 
 // Parametrization means that we can pass different commands to the same method.
 // - Because commands are objects, you can pass them around like data.
@@ -19,8 +18,7 @@
 
 namespace CommandDP
 {
-    // Command Interface
-    // A general command
+    // Command Interface  
     internal interface ICommand
     {
         void Execute();
@@ -31,7 +29,7 @@ namespace CommandDP
 
 
     // Command Receiver
-    // A Light class or object that does actions (the real work)
+    // A Light that does actions
     internal class Light
     {
         public void TurnOn() => Console.WriteLine("Light is ON.");
@@ -86,22 +84,22 @@ namespace CommandDP
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("---------------------------------");
-            Console.WriteLine("Command Design Pattern in C#.NET.");
-            Console.WriteLine("---------------------------------\n");
+            Console.WriteLine("-------------------------------------");
+            Console.WriteLine("The Command Design Pattern in C#.NET.");
+            Console.WriteLine("-------------------------------------\n");
 
 
-            Light light = new Light();
+            Light light = new(); // Receiver
 
-            ICommand turnon = new TurnOnCommand(light);
-            ICommand turnoff = new TurnOffCommand(light);
+            ICommand turnOn = new TurnOnCommand(light); // Command 1
+            ICommand turnOff = new TurnOffCommand(light); // Command 2
 
-            RemoteControl remoteControl = new RemoteControl();
+            RemoteControl remoteControl = new(); // Sender or Invoker
             
-            remoteControl.SetCommand(turnon);
+            remoteControl.SetCommand(turnOn);
             remoteControl.PressButton();
 
-            remoteControl.SetCommand(turnoff);
+            remoteControl.SetCommand(turnOff);
             remoteControl.PressButton();
 
 
