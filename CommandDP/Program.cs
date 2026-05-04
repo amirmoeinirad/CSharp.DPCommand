@@ -22,6 +22,7 @@ namespace CommandDP
     internal interface ICommand
     {
         void Execute();
+        void Undo();
     }
 
 
@@ -29,10 +30,11 @@ namespace CommandDP
 
 
     // Command Receiver
-    // A Light that does actions
+    // A Light that does actual actions
     internal class Light
     {
         public void TurnOn() => Console.WriteLine("Light is ON.");
+        
         public void TurnOff() => Console.WriteLine("Light is OFF.");
     }
 
@@ -45,8 +47,12 @@ namespace CommandDP
     internal class TurnOnCommand : ICommand
     {
         private Light _light;
+        
         public TurnOnCommand(Light light) => _light = light;
+        
         public void Execute() => _light.TurnOn();
+        
+        public void Undo() => _light.TurnOff();
     }
 
 
@@ -54,8 +60,12 @@ namespace CommandDP
     internal class TurnOffCommand : ICommand
     {
         private Light _light;
+        
         public TurnOffCommand(Light light) => _light = light;
+        
         public void Execute() => _light.TurnOff();
+        
+        public void Undo() => _light.TurnOn();
     }
 
 
@@ -69,9 +79,33 @@ namespace CommandDP
         #pragma warning disable CS8618
         private ICommand _command;
         #pragma warning restore CS8618
+        private Stack<ICommand> _undoStack = new();
+        private Stack<ICommand> _redoStack = new();
 
         public void SetCommand(ICommand command) => _command = command;
-        public void PressButton() => _command.Execute();
+        
+        public void PressButton()
+        {
+            _command.Execute();
+            _undoStack.Push(_command);
+            _redoStack.Clear();
+        }
+        
+        public void Undo()
+        {
+            if (_undoStack.Count == 0) return;
+            var cmd = _undoStack.Pop();
+            cmd.Undo();
+            _redoStack.Push(cmd);
+        }
+
+        public void Redo() 
+        {
+            if (_redoStack.Count == 0) return;
+            var cmd = _redoStack.Pop();
+            cmd.Execute();
+            _undoStack.Push(cmd);
+        }
     }
 
 
@@ -89,18 +123,38 @@ namespace CommandDP
             Console.WriteLine("-------------------------------------\n");
 
 
-            Light light = new(); // Receiver
+            Light light = new(); // Receiver            
 
             ICommand turnOn = new TurnOnCommand(light); // Command 1
-            ICommand turnOff = new TurnOffCommand(light); // Command 2
+            ICommand turnOff = new TurnOffCommand(light); // Command 2            
 
-            RemoteControl remoteControl = new(); // Sender or Invoker
-            
+            Console.WriteLine("A Remote Control...");
+            RemoteControl remoteControl = new(); // Sender or Invoker            
             remoteControl.SetCommand(turnOn);
             remoteControl.PressButton();
-
             remoteControl.SetCommand(turnOff);
             remoteControl.PressButton();
+
+            // A FIFO (First-In First-Out) Collection or Queue
+            Console.WriteLine("\nA Command Queue...");
+            Queue<ICommand> commandQueue = [];
+            commandQueue.Enqueue(turnOn);
+            commandQueue.Enqueue(turnOff);            
+            while (commandQueue.Count > 0)
+            {
+                var cmd = commandQueue.Dequeue();
+                cmd.Execute();
+            }
+
+            // A LIFO (Last-In First-Out) Collection
+            Console.WriteLine("\nA Command Stack for Undo/Redo...");
+            // Testing the Undo/Redo feature
+            remoteControl.SetCommand(turnOn);
+            remoteControl.PressButton();
+            Console.Write("Undo... ");
+            remoteControl.Undo();
+            Console.Write("Redo... ");
+            remoteControl.Redo();
 
 
             Console.WriteLine("\nDone.");
